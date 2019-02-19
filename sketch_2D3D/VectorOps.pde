@@ -1,3 +1,12 @@
+/*
+Rotates a 3D vector v a given number of radians, locking the x-axis
+<br>
+Note: this method mutates the vector. If the current vector can't 
+be changed, make a copy of it first!
+
+@param v the vector to rotate
+@param theta the number of radians to rotate the vector
+*/
 void rotateX(PVector v, float theta){
   float cos = cos(theta), sin = sin(theta);
   float tempY = v.y*cos-v.z*sin;
@@ -5,6 +14,15 @@ void rotateX(PVector v, float theta){
   v.y=tempY;
 }
 
+/*
+Rotates a 3D vector v a given number of radians, locking the y-axis
+<br>
+Note: this method mutates the vector. If the current vector can't 
+be changed, make a copy of it first!
+
+@param v the vector to rotate
+@param theta the number of radians to rotate the vector
+*/
 void rotateY(PVector v, float theta){
   float cos = cos(theta), sin = sin(theta);
   float tempX = v.x*cos+v.z*sin;
@@ -12,6 +30,15 @@ void rotateY(PVector v, float theta){
   v.x=tempX;
 }
 
+/*
+Rotates a 3D vector v a given number of radians, locking the x-axis
+<br>
+Note: this method mutates the vector. If the current vector can't 
+be changed, make a copy of it first!
+
+@param v the vector to rotate
+@param theta the number of radians to rotate the vector
+*/
 void rotateZ(PVector v, float theta){
   float cos = cos(theta), sin = sin(theta);
   float tempX = v.x*cos-v.y*sin;
@@ -19,9 +46,15 @@ void rotateZ(PVector v, float theta){
   v.x=tempX;
 }
 
+/*
+Displays a 2-dimensional vector by drawing an ellipse in its location
+
+@param vec the vector to display
+*/
 void drawVector(PVector vec){
   ellipse(vec.x,vec.y,8.0,8.0);
 }
+
 
 class Line{
   PVector position, direction;
