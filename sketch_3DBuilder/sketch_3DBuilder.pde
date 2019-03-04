@@ -2,8 +2,14 @@ float angleOfView = PI/9.0;
 
 int numImages = 100;
 
-TrackablePoint trackablePoint = new TrackablePoint();
+int debugStatus = 
+  //1; // Tracking points, their accuracies, and failures
+  //2; //Multiple output points, prints all points with their accuracies
+  3; //Multiple output points, prints all accurate (accuracy<0.05) points
+
 TrackablePoint2 trackablePoint2 = new TrackablePoint2();
+
+
 PVector point = new PVector(0, 0, 0);
 
 PVector[] cube = {
@@ -22,12 +28,15 @@ String[] data;
 
 int currentView = 20;
 
+int numTrackedPoints = 0;
+TrackablePoint2[] currentPoints = new TrackablePoint2[5 ];
+
 void setup() {
   frameRate(20);
 
   size(512, 512);
 
-  data = loadStrings("positions.csv");
+  data = loadStrings("sim1/positions.csv");
   views[currentView] = initializeView(data[currentView], currentView);
 
   stroke(200, 32, 0);
@@ -38,26 +47,24 @@ void setup() {
   View view = new View();
   view.position = new PVector(0, 0, 5);
   view.rotation = new PVector(0, 0, 0);
-  view.image=loadImage("0001.png");
+  view.image=loadImage("sim1/0001.png");
   println(view.projectPointToImage(point));
 
-  trackablePoint.trackAt(256, 256);
-  
   thread("imageLoaderThread");
   //noLoop();
 }
 
 void draw() {
   drawView(views[currentView]);
-  
+
   /*
   float h = -0;
-  for (PVector v : cube) {
-    colorMode(HSB);
-    stroke((h+=30), 255, 255);
-    drawVector(views[currentView].projectPointToImage(v));
-  }
-  */
+   for (PVector v : cube) {
+   colorMode(HSB);
+   stroke((h+=30), 255, 255);
+   drawVector(views[currentView].projectPointToImage(v));
+   }
+   */
   if (keyPressed) {
     currentView=(currentView+1)%numImages;
     if (views[currentView]==null) {
@@ -65,7 +72,7 @@ void draw() {
     }
   }
 
-  
+
 
   if (mousePressed) {
 
@@ -88,16 +95,39 @@ void draw() {
     //println(trackablePoint2.position);
   }
   boolean trackablePointIsLive = trackablePoint2.update(views[currentView]);
-  
+
   //stroke(200,255,255);
   //ellipse(trackablePoint2.locations[0].imageX,trackablePoint2.locations[0].imageY,8.0,8.0);
-  
+
   if (trackablePointIsLive) stroke(128, 255, 255);
   else stroke(0, 255, 255);
   PVector v = views[currentView].projectPointToImage(trackablePoint2.position);
   drawVector(v);
+
+
+  //Update all tracked points 
+  for (int i = 0; i < currentPoints.length; i++) {
+    if (currentPoints[i]==null)
+    {
+      currentPoints[i] = new TrackablePoint2();
+      currentPoints[i].update(views[currentView]);
+    }
+    if (!currentPoints[i].update(views[currentView])) {
+      if (currentPoints[i].accuracy<0.05 && debugStatus==3 || debugStatus==2) {
+        println(currentPoints[i].position);
+        //print("\t(");
+        //print(currentPoints[i].accuracy);
+        //println(")");
+      }
+      currentPoints[i] = new TrackablePoint2();
+      currentPoints[i].update(views[currentView]);
+      currentPoints[i].trackAt(int(random(width)), int(random(height)));
+    }
+  }
+
+
   //line(trackablePoint2.locations[0].imageX,trackablePoint2.locations[0].imageY,v.x,v.y);
-  
+
 
   //stroke(0,255,255);
   //drawVector(views[currentView].projectPointToImage(point));
@@ -119,8 +149,8 @@ void draw() {
 void mouseReleased() {
 }
 
-void imageLoaderThread(){
-  for(int i = 0; i < numImages; i++){
+void imageLoaderThread() {
+  for (int i = 0; i < numImages; i++) {
     if (views[i]==null) {
       views[i]=initializeView(data[i], i);
     }

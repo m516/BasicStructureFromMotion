@@ -107,11 +107,11 @@ class TrackablePoint2 { //<>// //<>// //<>//
       PVector newPosition = locations[0].estimatePosition(locations[1]);
       float newAccuracy = position.dist(newPosition);
       if (newAccuracy>accuracy) {
-        println("Failed");
+        if(debugStatus==1) println("Failed");
         isLive = false;
         return false;
       }
-      println(newAccuracy);
+      if(debugStatus==1) println(newAccuracy);
       accuracy = newAccuracy;
       if(iterations>=ITERATIONS_TO_FINE_TUNE) position.lerp(newPosition, SENSITIVITY);
       else position=newPosition;
@@ -138,7 +138,7 @@ class TrackablePoint2 { //<>// //<>// //<>//
 
   void trackAt(int x, int y) {
     if (locations[0]==null) {
-      throw new IllegalStateException("No views with this trackable point have been found, so it's impossible to start tracking");
+      throw new IllegalStateException("Can't track this point without a location first. Please call my update() method with the current view and then I'll start tracking.");
     }
     locations[0].imageX = x;
     locations[0].imageY = y;
@@ -240,160 +240,5 @@ class TrackablePoint2 { //<>// //<>// //<>//
       return line.pointClosestTo(stereoView.line);
       //return line.approximateIntersection(stereoView.line);
     }
-  }
-}
-
-
-
-class TrackablePoint {
-  public static final int SMALL_SEARCH_RADIUS = 10;
-  public static final int LARGE_SEARCH_RADIUS = 16;
-  public static final float SIMILARITY_THRESHOLD = 0.8;
-
-  PVector position;
-
-  View view;
-  int imageX = 0, imageY = 0;
-
-  View firstView;
-  int imageX0 = 0, imageY0 = 0;
-
-  void trackAt(int x, int y) {
-    imageX = x;
-    imageY = y;
-  }
-
-  boolean update(View newView) {
-    if (newView==null) throw new NullPointerException();
-
-
-    if (firstView==null) {
-      firstView = newView;
-      imageX0 = imageX;
-      imageY0 = imageY;
-    }
-
-
-    if (view==null) {
-      view = newView;
-      position = view.projectImageToPoint(view.image.width/2, view.image.height/2, null);
-    }
-    boolean found = false;
-    int newX = imageX, newY = imageY;
-
-    float similarity = 0.0, maxSimilarity = SIMILARITY_THRESHOLD;
-
-    for (int r = 1; r < LARGE_SEARCH_RADIUS; r++) {
-      for (int i = 0; i < 2*r; i++) {
-        similarity=getSimilarityTo(newView.image, imageX-r+i, imageY-r)-0.01*float(r)/SMALL_SEARCH_RADIUS;
-        if (similarity>maxSimilarity) {
-          found=true;
-          maxSimilarity = similarity;
-          newX=imageX-r+i;
-          newY=imageY-r;
-        }
-        similarity=getSimilarityTo(newView.image, imageX+r, imageY-r+i);
-        if (similarity>maxSimilarity) {
-          maxSimilarity = similarity;
-          found=true;
-          newX=imageX+r;
-          newY=imageY-r+i;
-        }
-        similarity=getSimilarityTo(newView.image, imageX+r-i, imageY+r);
-        if (similarity>maxSimilarity) {
-          maxSimilarity = similarity;
-          found=true;
-          newX=imageX+r-i;
-          newY=imageY+r;
-        }
-        similarity=getSimilarityTo(newView.image, imageX-r, imageY+r-i);
-        if (similarity>maxSimilarity) {
-          maxSimilarity = similarity;
-          found=true;
-          newX=imageX-r;
-          newY=imageY+r-i;
-        }
-      }
-    }
-
-    if (found) {
-      if (firstView.image!=newView.image && 
-        getSimilarity(firstView.image, imageX0, imageY0, newView.image, newX, newY, 8)<0.5) return false;
-      firstView=view;
-      imageX0=imageX;
-      imageY0=imageY;
-      imageX = newX;
-      imageY = newY;
-      view = newView;
-      position = newView.projectImageToPoint(imageX, imageY, position);
-      return true;
-    } else return false; //Search failed
-  }
-
-
-  float getSimilarityTo(PImage image, int x, int y) {
-    if (image==null) throw new NullPointerException();
-    if (view.image==null) throw new IllegalStateException();
-
-    if (view.image.pixels==null) view.image.loadPixels();
-    if (image.pixels==null) image.loadPixels();
-
-    return getSimilarity(view.image, imageX, imageY, image, x, y, 8);
-
-    /*
-    
-     //Compare individual pixels
-     
-     color c1 = view.image.pixels[imageY*view.image.width+imageX];
-     color c2 = image.pixels[y*image.width+x];
-     float errHue = abs(hue(c2)-hue(c1))*brightness(c1)/65536.0;
-     float errBrightness = abs(brightness(c2)-brightness(c1))/255.0;
-     float errSaturation = abs(saturation(c2)-saturation(c1))/255.0;
-     float error1 = (errHue+errBrightness+errSaturation)/3.0;
-     
-     float dot = 0.0, t1 = 0.0, t2 = 0.0; //Dot product variables
-     float totalDifference = 0.0, weight = 0.0; //Cumulative similarity variables
-     
-     for (int i = -SMALL_SEARCH_RADIUS; i<SMALL_SEARCH_RADIUS; i++) {
-     for (int j = -SMALL_SEARCH_RADIUS; j<SMALL_SEARCH_RADIUS; j++) {
-     color c3 = view.image.pixels[(imageY+j)*view.image.width+imageX+i];
-     color c4 = image.pixels[(y+j)*image.width+x+i];
-     
-     //Calculate the dot product of
-     //the vectors formed by the areas
-     //around the two pixels
-     dot+=hue(c3)*hue(c4)+brightness(c3)*brightness(c4)+saturation(c3)*saturation(c4);
-     t1+=hue(c3)*hue(c3)+brightness(c3)*brightness(c3)+saturation(c3)*saturation(c3);
-     t2+=hue(c4)*hue(c4)+brightness(c4)*brightness(c4)+saturation(c4)*saturation(c4);
-     
-     //Calculate the similarity of two subimages
-     //by subtracting one picture from the other and
-     //comparing the net HSV with the one from the
-     //first image
-     totalDifference+=abs(saturation(c4)-saturation(c3))+abs(brightness(c4)-brightness(c3))/255.0;
-     weight+=255.0;
-     }
-     }
-     //Evaluate the dot and constrain it between -1 and 1
-     dot = abs(dot*dot/(t1*t2));
-     if (Float.isNaN(dot)) return 0.0;
-     assert dot<=1.0: 
-     "Dot is "+dot;
-     
-     
-     //print(1.0-error1);
-     //print("     ");
-     //print(5.0*dot-4.0);
-     //print("     ");
-     //print((1.0-totalDifference/weight));
-     //print("     ");
-     
-     float similarity = ((1.0-error1)+max(0,(5.0*dot-4.0))+(1.0-totalDifference/weight))/3.0;
-     
-     //println(similarity);
-     
-     //Get an average-ish value of pixel-comparison, dot product, and pixel field
-     return similarity;
-     */
   }
 }

@@ -12,7 +12,8 @@ class View {
     rotation = new PVector(float(strings[3]), float(strings[4]), float(strings[5]));
 
     //Get image
-    StringBuilder imagePath = new StringBuilder(8);
+    StringBuilder imagePath = new StringBuilder(12);
+    imagePath.append("sim1/");
     imageNum++;
     imagePath.append(imageNum/1000);
     imageNum%=1000;
