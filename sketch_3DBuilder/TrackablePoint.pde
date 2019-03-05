@@ -27,7 +27,7 @@ class TrackablePoint2 { //<>// //<>// //<>//
   //current one, with more weight on the previous one when the sensitivity
   //is closer to 0 and more weight on the current one when the sensitivity
   //is closer to 1
-  public static final float SENSITIVITY = 0.9;
+  public static final float SENSITIVITY = 0.8;
 
   //True if this trackable point can still track its object in images
   boolean isLive = true; 
