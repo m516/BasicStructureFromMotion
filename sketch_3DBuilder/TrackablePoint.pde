@@ -1,6 +1,6 @@
 class TrackablePoint2 { //<>// //<>// //<>//
-  public static final int SMALL_SEARCH_RADIUS = 10;
-  public static final int LARGE_SEARCH_RADIUS = 16;
+  public static final int SMALL_SEARCH_RADIUS = 8;
+  public static final int LARGE_SEARCH_RADIUS = 8;
   public static final float SIMILARITY_THRESHOLD = 0.8;
 
   int iterations = 0; //Count of the number of views found
@@ -28,6 +28,13 @@ class TrackablePoint2 { //<>// //<>// //<>//
   //is closer to 0 and more weight on the current one when the sensitivity
   //is closer to 1
   public static final float SENSITIVITY = 0.8;
+  
+  //For each update() call, the accuracy field is updated. To find points
+  //that can't converge to one place, the update() method will calculate
+  //the distance between the new location found and the original one. 
+  //TrackablePoints will die if their current accuracy values are greater
+  //than the original ones multiplied by this PRESISION value
+  public static final float PRECISION = 0.9;
 
   //True if this trackable point can still track its object in images
   boolean isLive = true; 
@@ -106,15 +113,14 @@ class TrackablePoint2 { //<>// //<>// //<>//
       //than if it doesn't.
       PVector newPosition = locations[0].estimatePosition(locations[1]);
       float newAccuracy = position.dist(newPosition);
-      if (newAccuracy>accuracy) {
+      if (newAccuracy>accuracy*PRECISION) {
         if(debugStatus==1) println("Failed");
         isLive = false;
         return false;
       }
       if(debugStatus==1) println(newAccuracy);
       accuracy = newAccuracy;
-      if(iterations>=ITERATIONS_TO_FINE_TUNE) position.lerp(newPosition, SENSITIVITY);
-      else position=newPosition;
+      position = newPosition;
 
       //Increment the iteration count
       iterations++;
@@ -129,7 +135,7 @@ class TrackablePoint2 { //<>// //<>// //<>//
       }
       //If multiple views
       else {
-        position.lerp(locations[0].estimatePosition(locations[1]), SENSITIVITY);
+        position=locations[0].estimatePosition(locations[1]);
       }
     }
 

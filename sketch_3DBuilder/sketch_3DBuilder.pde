@@ -5,7 +5,7 @@ int numImages = 100;
 int debugStatus = 
   //1; // Tracking points, their accuracies, and failures
   //2; //Multiple output points, prints all points with their accuracies
-3; //Multiple output points, prints all accurate (accuracy<0.05) points
+  3; //Multiple output points, prints all accurate (accuracy<0.05) points
 
 TrackablePoint2 trackablePoint2 = new TrackablePoint2();
 
@@ -38,9 +38,9 @@ void setup() {
 
   data = loadStrings("sim1/positions.csv");
   views[currentView] = initializeView(data[currentView], currentView);
-  
+
   initializeOutputFiles();
-  
+
 
   stroke(200, 32, 0);
   strokeWeight(4);
@@ -128,9 +128,11 @@ void draw() {
       currentPoints[i].update(views[currentView]);
       currentPoints[i].trackAt(int(random(width)), int(random(height)));
     } else {
-      stroke(100.0-100.0*currentPoints[i].accuracy, 255, 180);
-      v = views[currentView].projectPointToImage(currentPoints[i].position);
-      drawVector(v);
+      //stroke(100.0-100.0*currentPoints[i].accuracy, 255, 180);
+      if (currentPoints[i].accuracy<0.1) {
+        v = views[currentView].projectPointToImage(currentPoints[i].position);
+        drawVector(v);
+      }
     }
   }
 
