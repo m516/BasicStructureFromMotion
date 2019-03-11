@@ -2,10 +2,12 @@
 Right now this repo just contains a sketch of an idea for a SFM algorithm; 
 it doesn't actually reconstruct 3D objects yet, but that's the goal!
 
-It's getting close though: right now it does estimate where a single point is in 
-3D space based on two or more images and the location/orientation of the camera.
-In theory, if it did the same thing for thousands of points per image, then a point
-cloud could be generated to make a 3D object.
+Right now, the program can find and track several points in a generated "video feed"
+comprised of 100 3D renders of a solid, textured object. However, as it builds a point cloud,
+it fails to distinguish good data from bad. Most notably, it "tracks" points in a solid 
+background where all points look the same, and it assumes they are parts of the
+object because they don't move (when really they do but are just replaced by identical points).
+
 
 ## Installation Instructions
 
