@@ -19,8 +19,8 @@ float getSimilarity(PImage img1, int x1, int y1, PImage img2, int x2, int y2, in
       color c1 = img1.pixels[(y1+j)*img1.width+(x1+i)];
       color c2 = img2.pixels[(y2+j)*img2.width+(x2+i)];
       
-      float r1 = red(c1), g1 = green(c1), b1 = blue(c1);
-      float r2 = red(c2), g2 = green(c2), b2 = blue(c2);
+      float r1 = c1>>16&0xFF, g1 = c1>>8&0xFF, b1 = c1&0xFF;
+      float r2 = c2>>16&0xFF, g2 = c1>>8&0xFF, b2 = c2&0xFF;
       
       dot +=r1*r2+g1*g2+b1*b2;
       mag1+=r1*r1+g1*g1+b1*b1;
