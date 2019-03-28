@@ -19,17 +19,44 @@ public class Feature {
     this.cameraCoordinates=cameraCoordinates;
     this.positionInImage = new PVector(imageX, imageY);
   }
+  
+  public Feature(String cameraDimensions, String imageDimensions, String positionInImage){
+    parseFromStrings(cameraDimensions, imageDimensions, positionInImage);
+  }
 
   PVector estimatePosition(Feature alternateView) {
     return locationInWorld.pointClosestTo(alternateView.locationInWorld);
     //return locationInWorld.approximateIntersection(alternateView.locationInWorld);
   }
 
-  public Feature parseFromStrings(String cameraDimensions, String imageDimensions, String positionInImage) {
-    Feature feature;
+  private void parseFromStrings(String cameraDimensions, String imageDimensions, String positionOfPointInImage) {
     String[] cc = split(cameraDimensions, ' ');
     String[] id = split(imageDimensions, ' ');
-    String[] pii= split(positionInImage, ' ');
+    String[] pii= split(positionOfPointInImage, ' ');
+    
+    //File checking
+    if(cc.length!=7){
+      print("Error parsing camera directions in the following line\n     ");
+      println(cameraDimensions);
+      println("Expecting 7 values separated by a single space");
+      println("Line should be: 'posX posY posZ dirX dirY dirZ angleOfViewInRadians'");
+      throw new IllegalArgumentException();
+    }
+    if(id.length!=2){
+      print("Error parsing image dimensions in the following line\n     ");
+      println(imageDimensions);
+      println("Expecting 2 values separated by a single space");
+      println("Line should be: 'widthInPixels heightInPixels'");
+      throw new IllegalArgumentException();
+    }
+    if(pii.length!=2){
+      print("Error parsing image coordinates for feature in the following line\n     ");
+      println(positionInImage);
+      println("Expecting 2 values separated by a single space");
+      println("Line should be: 'xInPixels yInPixels'");
+      println("Also note that x and y are positive values relative to the upper left-hand corner of the image");
+      throw new IllegalArgumentException();
+    }
 
     PVector position = new PVector(float(cc[0]), float(cc[1]), float(cc[2]));
     PVector direction = new PVector(float(cc[3]), float(cc[4]), float(cc[5]));
@@ -47,22 +74,17 @@ public class Feature {
       );
 
     PVector posInImage = new PVector(float(pii[0]), float(pii[1]));
-
-    return new Feature(camera, posInImage);
-  }
-}
-
-public abstract class FeatureExtractor {
-  CameraCoordinates coordinates;
-  PImage image;
-  LinkedList<Feature> features;
-
-  void extractFeaturesFromView(String outputFile){
     
+    cameraCoordinates=camera;
+    positionInImage = posInImage;
   }
-
-    abstract boolean isFeature(int x, int y); //to be implemented by corner detectors, etc.
+  
+  public boolean equals(Object other){
+      throw new UnsupportedOperationException("Method not implemented yet!");
+  }
 }
+
+
 
 
 

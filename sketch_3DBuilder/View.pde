@@ -151,7 +151,7 @@ class View {
     abs(view.rotation.y-rotation.y)+
     abs(view.rotation.y-rotation.z))<tolerance;
   }
-} //<>//
+} //<>// //<>//
 
 View initializeView(String data, int index) {
   View view = new View();
