@@ -52,17 +52,24 @@ public abstract class FeatureExtractor {
   }
 
   abstract void loadAllFeaturesFromImage(); //Potentially faster than searching pixel-by-pixel
+  
+  public void draw(){
+     image(image,0,0);
+     for(Feature f: features){
+       ellipse(f.positionInImage.x, f.positionInImage.y, 8, 8);
+     }
+  }
 }
 
 
 
 public class FeatureExtractorLoader {
-  FeatureExtractor featureExtractor;
+  FeatureExtractor[] featureExtractors;
 
   public FeatureExtractorLoader() {
   };
 
-  public FeatureExtractor loadFeatureExtractor(String data, int imageNum) {
+  public FeatureExtractor[] loadFeatureExtractors(String data, int imageNum) {
     
     
     //Get vectors
@@ -88,7 +95,10 @@ public class FeatureExtractorLoader {
     
     CameraCoordinates cc = new CameraCoordinates(image, PI/9.0, position, direction);
     
-    //FIXME
-    FeatureExtractor f = new FeatureExtractor(cc, image);
+    FeatureExtractor[] f = new FeatureExtractor[1];
+    f[0] = new HarrisCornerDetector(cc, image);
+    
+    featureExtractors = f;
+    return f;
   }
 }
