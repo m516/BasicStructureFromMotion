@@ -79,55 +79,17 @@ public class Feature {
     positionInImage = posInImage;
   }
   
+  //Only returns a String representation of the PositionInImage vector.
+  //To get a String representation of the camera coordinates use CamaeraCoordinates.toString()
+  public String toString(){
+    StringBuilder sb = new StringBuilder(64);
+    sb.append(positionInImage.x);
+    sb.append(" ");
+    sb.append(positionInImage.y);
+    return sb.toString();
+  }
+  
   public boolean equals(Object other){
       throw new UnsupportedOperationException("Method not implemented yet!");
-  }
-}
-
-
-
-
-
-
-
-
-public class CameraCoordinates {
-  PVector position;
-  PVector direction;
-  float angleOfView;
-  PVector imageResolution;
-
-  public CameraCoordinates(PImage image, float angleOfView, PVector position, PVector direction) {
-    imageResolution = new PVector(image.width, image.height);
-    this.angleOfView = angleOfView;
-    this.direction = direction;
-    this.position = position;
-  }
-
-  public CameraCoordinates(PVector imageResolution, float angleOfView, PVector position, PVector direction) {
-    this.imageResolution = imageResolution;
-    this.angleOfView = angleOfView;
-    this.direction = direction;
-    this.position = position;
-  }
-
-  Line castRay(float imageX, float imageY) {
-    Line ray = new Line();
-    ray.position=position.copy();
-    ray.direction=new PVector(0, 0, -1);
-    //Set the vector's x and y values so that the point appears to be in
-    // the same place as "imageCoordinates" when projected onto the image
-    ray.direction.x=-(imageX-imageResolution.x/2.0)/2.0/imageResolution.x*ray.direction.z/QUARTER_PI*angleOfView;
-    ray.direction.y =(imageY-imageResolution.x/2.0)/2.0/imageResolution.y*ray.direction.z/QUARTER_PI*angleOfView;
-
-    //Apply the camera transformations
-    //Rotate around the camera
-    rotateX(ray.direction, direction.x);
-    rotateY(ray.direction, direction.y);
-    rotateZ(ray.direction, direction.z);
-
-    ray.direction.setMag(1);
-
-    return ray;
   }
 }

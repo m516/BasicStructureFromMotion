@@ -13,7 +13,7 @@ public abstract class FeatureExtractor {
 
   private void printFeaturesToFile(String outputFileName) {
     try {
-      File file =new File("/users/kitayui/desktop/test.txt");
+      File file =new File(outputFileName);
       //chemin = dataPath;
       // positions.txt== your file;
 
@@ -25,7 +25,10 @@ public abstract class FeatureExtractor {
       BufferedWriter bw = new BufferedWriter(fw);
       PrintWriter pw = new PrintWriter(bw);
 
-      pw.write("hello world!!!!! j'ajoute something au txt");
+      pw.write(coordinates.toString());
+      for (Feature feature : features) {
+        pw.write(feature.toString());
+      }
 
       pw.close();
     }
@@ -47,6 +50,45 @@ public abstract class FeatureExtractor {
     this.image = image;
     features.clear();
   }
-  
+
   abstract void loadAllFeaturesFromImage(); //Potentially faster than searching pixel-by-pixel
+}
+
+
+
+public class FeatureExtractorLoader {
+  FeatureExtractor featureExtractor;
+
+  public FeatureExtractorLoader() {
+  };
+
+  public FeatureExtractor loadFeatureExtractor(String data, int imageNum) {
+    
+    
+    //Get vectors
+    String[] strings = split(data, ", ");
+  assert strings.length==6: 
+    "Failed to load view: expected vectors for position and rotation (6 values) but got "+strings.length;
+    PVector position = new PVector(float(strings[0]), float(strings[1]), float(strings[2]));
+    PVector direction = new PVector(float(strings[3]), float(strings[4]), float(strings[5]));
+
+    //Get image
+    StringBuilder imagePath = new StringBuilder(12);
+    imagePath.append("sim1/");
+    imageNum++;
+    imagePath.append(imageNum/1000);
+    imageNum%=1000;
+    imagePath.append(imageNum/100);
+    imageNum%=100;
+    imagePath.append(imageNum/10);
+    imageNum%=10;
+    imagePath.append(imageNum);
+    imagePath.append(".png");
+    PImage image=loadImage(imagePath.toString());
+    
+    CameraCoordinates cc = new CameraCoordinates(image, PI/9.0, position, direction);
+    
+    //FIXME
+    FeatureExtractor f = new FeatureExtractor(cc, image);
+  }
 }
