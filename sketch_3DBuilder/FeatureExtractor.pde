@@ -58,6 +58,7 @@ public abstract class FeatureExtractor {
     if (features==null) {
       text("No features processed yet", 8, 16);
     } else {
+      text("Features found: "+features.size(), 8, 16);
       for (Feature f : features) {
         ellipse(f.positionInImage.x, f.positionInImage.y, 8, 8);
       }

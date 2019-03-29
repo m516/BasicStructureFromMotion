@@ -21,6 +21,8 @@ void draw() {
   else {
     background(32,32,48);
     extractor.draw();
+    fill(255);
+    text(imageNum, 8,30);
   }
 }
 
