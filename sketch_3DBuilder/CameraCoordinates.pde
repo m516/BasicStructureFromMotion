@@ -37,6 +37,9 @@ public class CameraCoordinates {
 
     return ray;
   }
+  
+  Line castRay(PVector imageCoords){return castRay(imageCoords.x,imageCoords.y);}
+  Line castRay(Feature feature){return castRay(feature.positionInImage.x,feature.positionInImage.y);}
 
   public String toString() {
     StringBuilder sb = new StringBuilder(64);

@@ -86,7 +86,7 @@ class Line{
   /**
   * Returns the intersection of two lines in 3D space
   * or approximates it if the lines don't intersect
-  * See Wikipedia article about skew lines
+  * //Source: https://en.wikipedia.org/wiki/Skew_lines
   **/
   public PVector approximateIntersection(Line line){
     PVector n1 = line.direction.cross(direction, new PVector());
@@ -104,5 +104,18 @@ class Line{
     c2.add(line.position);
     
     return c1.lerp(c2, 0.5);
+  }
+  
+  public float distanceFrom(Line other){
+    //Inspired by the distance function between two skew lines on Wikipedia
+    //Source: https://en.wikipedia.org/wiki/Skew_lines#Distance
+    
+    PVector n = new PVector(); 
+    direction.cross(other.direction, n);
+    
+    PVector cMinusA = new PVector();
+    PVector.sub(other.position, position, cMinusA);
+    
+    return abs(n.dot(cMinusA));
   }
 }

@@ -13,20 +13,27 @@ public class Feature {
   public Feature(CameraCoordinates cameraCoordinates, PVector positionInImage) {
     this.cameraCoordinates=cameraCoordinates;
     this.positionInImage = positionInImage;
+    updateLocationInWorld();
   }
 
   public Feature(CameraCoordinates cameraCoordinates, float imageX, float imageY) {
     this.cameraCoordinates=cameraCoordinates;
     this.positionInImage = new PVector(imageX, imageY);
+    updateLocationInWorld();
   }
   
   public Feature(String cameraDimensions, String imageDimensions, String positionInImage){
     parseFromStrings(cameraDimensions, imageDimensions, positionInImage);
+    updateLocationInWorld();
   }
 
   PVector estimatePosition(Feature alternateView) {
     return locationInWorld.pointClosestTo(alternateView.locationInWorld);
     //return locationInWorld.approximateIntersection(alternateView.locationInWorld);
+  }
+  
+  public void updateLocationInWorld(){
+    locationInWorld = cameraCoordinates.castRay(positionInImage);
   }
 
   private void parseFromStrings(String cameraDimensions, String imageDimensions, String positionOfPointInImage) {
@@ -77,6 +84,13 @@ public class Feature {
     
     cameraCoordinates=camera;
     positionInImage = posInImage;
+  }
+  
+  public float distanceFrom(Feature other){
+    if(locationInWorld==null) updateLocationInWorld();
+    if(other.locationInWorld==null) other.updateLocationInWorld();
+    
+    return locationInWorld.distanceFrom(other.locationInWorld);
   }
   
   //Only returns a String representation of the PositionInImage vector.
