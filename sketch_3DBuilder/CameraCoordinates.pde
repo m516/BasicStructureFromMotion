@@ -180,4 +180,8 @@ public class CameraCoordinates {
   PVector projectImageToPoint(PVector imageCoordinates, PVector guess) {
     return projectImageToPoint(imageCoordinates.x, imageCoordinates.y, guess);
   }
+  
+  float angle(CameraCoordinates other){
+    return PVector.angleBetween(direction, other.direction);
+  }
 }

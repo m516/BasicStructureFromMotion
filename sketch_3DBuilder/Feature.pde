@@ -28,6 +28,9 @@ public class Feature {
   }
 
   PVector estimatePosition(Feature alternateView) {
+    if(alternateView==null) throw new NullPointerException("Feature is null");
+    if(alternateView.locationInWorld==null) alternateView.updateLocationInWorld();
+    if(locationInWorld==null) updateLocationInWorld();
     return locationInWorld.pointClosestTo(alternateView.locationInWorld);
     //return locationInWorld.approximateIntersection(alternateView.locationInWorld);
   }
@@ -90,8 +93,11 @@ public class Feature {
     if(locationInWorld==null) updateLocationInWorld();
     if(other.locationInWorld==null) other.updateLocationInWorld();
     
+    
     return locationInWorld.distanceFrom(other.locationInWorld);
   }
+    
+
   
   //Only returns a String representation of the PositionInImage vector.
   //To get a String representation of the camera coordinates use CamaeraCoordinates.toString()
