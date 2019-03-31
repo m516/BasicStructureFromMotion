@@ -1,3 +1,7 @@
+/*
+Gets the similarity between the pixel in img1 at (x1,y1) and the pixel in img2 at (x2,y2)
+based on the pixels around them
+*/
 float getSimilarity(PImage img1, int x1, int y1, PImage img2, int x2, int y2, int radius){
   if(x1<radius) return 0.0;
   if(y1<radius) return 0.0;
@@ -36,3 +40,13 @@ float getSimilarity(PImage img1, int x1, int y1, PImage img2, int x2, int y2, in
   
   return abs(dot)-totalDifference/(radius*radius*3*256);
 }
+
+/*
+Searches the pixels within a radius LARGE_SEARCH_RADIUS around the point (x2, y2)
+in img2, and compares them with the pixel at (x1,y1) within img1
+
+Returns a 3D PVector, where X and Y are the screen coordinates and Z is the 
+*/
+//PVector getMostSimilarPixel(PImage img1, int x1, int y1, PImage img2, int x2, int y2){
+  
+//}
