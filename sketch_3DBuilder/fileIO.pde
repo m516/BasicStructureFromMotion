@@ -3,7 +3,8 @@ public class PointCloudWriter {
   private String plyFile = "data/pointCloud.ply";
 
 
-  PrintWriter outputSSV, outputPLY;
+  PrintWriter outputSSV;
+  PrintWriter outputPLY;
 
   public PointCloudWriter(String extensionlessFileName) {
     ssvFile = extensionlessFileName + ".ssv";

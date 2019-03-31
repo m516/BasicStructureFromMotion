@@ -63,7 +63,7 @@ public class FeatureAssembler {
           for (Feature g : b.features) {
             float newDistance = f.distanceFrom(g);
             if (f.distanceFrom(g)<minDistance) {
-              
+
               float newSimilarity = getSimilarity(a.image, int(f.positionInImage.x), int(f.positionInImage.y), b.image, int(g.positionInImage.x), int(g.positionInImage.y), 8);
 
               //Check if the points look similar. If they don't these points don't really match
@@ -76,7 +76,9 @@ public class FeatureAssembler {
           }//end for
         }//end for
         if (closest!=null) {
-          output.printVector(f.estimatePosition(closest));
+          synchronized(output) {
+            output.printVector(f.estimatePosition(closest));
+          }
           pointCount++;
         }
       }//end for
@@ -112,15 +114,15 @@ public class FeatureAssembler {
       delay(100);
     }
     boolean threadStillRunning = true;
-    while(threadStillRunning) {
+    while (threadStillRunning) {
       threadStillRunning = false;
       for (int i = 0; i < numberOfThreads; i++) {
-        if(threads[i].isAlive()) threadStillRunning = true;
+        if (threads[i].isAlive()) threadStillRunning = true;
       }
       delay(500);
     }
     output.close();
-    print("Done processing. (time :");
+    print("Done processing. (time: ");
     print(millis()-time);
     println(" milliseconds)");
   }
