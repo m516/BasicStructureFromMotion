@@ -1,4 +1,4 @@
-*.ssv
-*.ply
-*.blend
-*.blend*
+sketch_3DBuilder/data/*.ssv
+sketch_3DBuilder/data/*.ply
+sketch_3DBuilder/data/*.blend
+sketch_3DBuilder/data/*.blend*
