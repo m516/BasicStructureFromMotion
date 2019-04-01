@@ -12,35 +12,50 @@ void setup() {
   size(640, 480);
 
   viewDimensions = loadStrings("sim1/positions.csv");
-  loader = new FeatureExtractorFactory();
-  
+
   assembler = new FeatureAssembler();
 
   //Build the model
-  
+
   println("Loading Assembler");
 
   int m = millis();
-  for (int i = 0; i < 100; i++) {
-    int n = millis();
-    extractor = loader.createFeatureExtractors(viewDimensions[i], i)[0];
-    assembler.addView(extractor);
-    print("\t");
-    print(i);
-    print(".) Found ");
-    print(extractor.features.size());
-    print(" features in ");
-    print(millis()-n);
-    println(" milliseconds");
+  for (int i = 0; i < 8; i++) {
+    thread("loaderThread");
+  }
+  while (currentIndex<100) {
+    delay(5000);
   }
   print("Time spent loading 100 FeatureExtractors: ");
   println(millis()-m);
-  
+
   println("Assembling");
   m = millis();
   assembler.generatePointCloud("data/pointCloud", 7);
   print("Time spent assembling: ");
   println(millis()-m);
+}
+
+volatile int currentIndex = 1;
+void loaderThread() {
+
+  loader = new FeatureExtractorFactory();
+
+  while (currentIndex<100) {
+    int i = currentIndex++;
+    int n = millis();
+    FeatureExtractor featureExtractor = loader.createFeatureExtractors(viewDimensions[i], i)[0];
+    assembler.addView(featureExtractor);
+    synchronized(System.out) {
+      print("\t");
+      print(i);
+      print(".) Found ");
+      print(featureExtractor.features.size());
+      print(" features in ");
+      print(millis()-n);
+      println(" milliseconds");
+    }
+  }
 }
 
 void draw() {
