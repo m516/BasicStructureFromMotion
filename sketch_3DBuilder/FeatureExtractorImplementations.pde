@@ -157,6 +157,6 @@ public class HarrisCornerDetector extends FeatureExtractor { //<>//
 
   @Override public void draw() {
     super.draw();
-    loadAllFeaturesFromImage();
+    //loadAllFeaturesFromImage();
   }
 }

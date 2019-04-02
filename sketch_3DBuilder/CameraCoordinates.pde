@@ -184,4 +184,9 @@ public class CameraCoordinates {
   float angle(CameraCoordinates other){
     return PVector.angleBetween(direction, other.direction);
   }
+  
+  void resetTo(PVector position, PVector direction){
+    this.position = position;
+    this.direction = direction;
+  }
 }
