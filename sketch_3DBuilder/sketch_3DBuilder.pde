@@ -15,43 +15,51 @@ void setup() {
   viewDimensions = loadStrings("sim1/positions.csv");
 
   assembler = new FeatureAssembler();
-  
+
   loader = new FeatureExtractorFactory();
 
   //Build the model
 
-  /*
   println("Loading Assembler");
-   
-   int m = millis();
-   for (int i = 0; i < 8; i++) {
-   thread("loaderThread");
-   }
-   while (currentIndex<100) {
-   delay(5000);
-   }
-   print("Time spent loading 100 FeatureExtractors: ");
-   println(millis()-m);
-   
-   
-   println("Assembling");
-   m = millis();
-   assembler.generatePointCloud("data/pointCloud", 7);
-   print("Time spent assembling: ");
-   println(millis()-m);
-   */
+
+  int m = millis();
+  for (int i = 0; i < 8; i++) {
+    thread("loaderThread");
+  }
+  while (currentIndex<100) {
+    delay(5000);
+  }
+  print("Time spent loading 100 FeatureExtractors: ");
+  println(millis()-m);
+
+  thread("assemblyThread");
 }
 
-volatile int currentIndex = 0;
+volatile int currentIndex = 1;
+
+
+void assemblyThread() {
+
+
+
+  println("Assembling");
+  int m = millis();
+  assembler.generatePointCloud("data/pointCloud", 7);
+  print("Time spent assembling: ");
+  println(millis()-m);
+}
+
 void loaderThread() {
 
   FeatureExtractorFactory loader = new FeatureExtractorFactory();
 
-  while (currentIndex<100) {
+  while (currentIndex<101) {
     int i = currentIndex++;
     int n = millis();
     FeatureExtractor featureExtractor = loader.createFeatureExtractors(viewDimensions[i], i)[0];
-    assembler.addView(featureExtractor);
+    synchronized(assembler) {
+      assembler.addView(featureExtractor);
+    }
     synchronized(System.out) {
       print("\t");
       print(i);
@@ -83,10 +91,10 @@ void draw() {
 void mouseReleased() {
 
   imageNum%=100;
-  extractor1 = loader.createFeatureExtractors(viewDimensions[imageNum], imageNum-1)[0];
+  extractor1 = loader.createFeatureExtractors(viewDimensions[imageNum], imageNum)[0];
   extractor1.loadAllFeaturesFromImage();
   imageNum++;
   imageNum%=100;
-  extractor2 = loader.createFeatureExtractors(viewDimensions[imageNum], imageNum-1)[0];
+  extractor2 = loader.createFeatureExtractors(viewDimensions[imageNum], imageNum)[0];
   extractor2.loadAllFeaturesFromImage();
 }
