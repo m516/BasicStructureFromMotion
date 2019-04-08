@@ -49,12 +49,17 @@ public class FeatureAssembler {
 
       AnnotatedView a = views.get(i);
       for (Feature f : a.features) {
-        //Find the closest point to this one
-        Feature closest = null;
-        float minDistance = Float.POSITIVE_INFINITY;
-        float highestSimilarity = 0.6;
+        //For each view, find the closest point to this one
+        Feature[] matchedFeatures = new Feature[6];
+        int numMatchedFeatures = 0;
 
-        for (int j = i+1; j < views.size(); j++) {
+        for (int j = 0; j < views.size(); j++) {
+          if (j==i) continue;
+
+          Feature closest = null;
+          float minDistance = 10.0;
+          float highestSimilarity = 0.85;
+
           AnnotatedView b = views.get(j);
 
           //Don't include views that are really close to each other; the parallax between them is too few
@@ -74,10 +79,21 @@ public class FeatureAssembler {
               }
             }//end if
           }//end for
+          if (closest != null) {
+            matchedFeatures[numMatchedFeatures++] = closest;
+            if (numMatchedFeatures==matchedFeatures.length) break;
+          }
         }//end for
-        if (closest!=null) {
+
+
+        if (numMatchedFeatures>4) {
           synchronized(output) {
-            output.printVector(f.estimatePosition(closest));
+            PVector average = f.estimatePosition(matchedFeatures[0]);
+            for(int j = 1; j < numMatchedFeatures; j++){
+              average.add(f.estimatePosition(matchedFeatures[j]));
+            }
+            average.div(float(numMatchedFeatures));
+            output.printVector(f.estimatePosition(matchedFeatures[0]));
           }
           pointCount++;
         }
